@@ -39,7 +39,7 @@ Latest:
 
 <details>
  <summary>Code examples</summary>
- ```
+ ```javascript
   // Sidebar fields
   let startBtn = document.getElementById("start"),
     val = document.querySelectorAll("div[class*='value']"),
