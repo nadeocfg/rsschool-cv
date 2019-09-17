@@ -39,7 +39,7 @@ Latest:
 
 <details>
  <summary>Code examples</summary>
- ```javascript
+ <pre>
   // Sidebar fields
   let startBtn = document.getElementById("start"),
     val = document.querySelectorAll("div[class*='value']"),
@@ -177,7 +177,7 @@ Latest:
     timeData: time,
     savings: false
   };
- ```
+ </pre>
 </details>
 
 ---
