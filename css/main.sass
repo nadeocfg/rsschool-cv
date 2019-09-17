@@ -1,0 +1,138 @@
+$white-color: #fff
+$black-color: #323232
+$primary-color: #84d0c4
+$accent-color: #ff7e57
+$grey-color: #9d9d9d
+
+body
+  font-family: 'Montserrat', sans-serif
+  background: url('../img/main-bg.png') repeat top center
+  color: $black-color
+
+.container
+  background: $white-color
+  max-width: 1024px
+  margin-top: 160px
+  margin-bottom: 80px
+  padding-left: 30px
+  padding-right: 30px
+  border: 1px solid $black-color
+  -webkit-box-shadow: 11px 11px 0px 0px rgba(50, 50, 50, 0.75)
+  -moz-box-shadow: 11px 11px 0px 0px rgba(50, 50, 50, 0.75)
+  box-shadow: 11px 11px 0px 0px rgba(50, 50, 50, 0.75)
+
+.header
+  margin-bottom: 48px
+
+  &:hover h1
+    text-shadow: -3px -3px 0px $accent-color
+
+  &__content
+    margin-top: 120px
+
+  &__subtitle
+    display: block
+    font-size: 21px
+    font-weight: 700
+
+  &__photo
+    margin: -100px
+    border: 1px solid $black-color
+
+  &__contacts
+    text-align: right
+
+a
+  color: $black-color
+  border-bottom: 1px solid $primary-color
+  -webkit-transition: all 0.3s
+  -moz-transition: all 0.3s
+  -o-transition: all 0.3s
+  transition: all 0.3s
+
+  &:hover
+    border-bottom: 1px solid $accent-color
+    color: $primary-color
+    text-decoration: none
+
+h1,
+h2,
+h3
+  font-weight: 900
+  text-shadow: 3px 3px 0px $primary-color
+  -webkit-transition: all 0.3s
+  -moz-transition: all 0.3s
+  -o-transition: all 0.3s
+  transition: all 0.3s
+
+  &:hover
+    text-shadow: -3px -3px 0px $accent-color
+
+h1
+  display: inline-block
+  padding-bottom: 10px
+  font-size: 3.5rem
+  border-bottom: 10px solid $black-color
+
+h3
+  font-size: 1.5rem
+
+ul
+  list-style-type: none
+  padding-left: 0
+
+li
+  margin-bottom: 8px
+  padding-left: 26px
+  background: url(../img/marker.png) no-repeat top left
+
+.cv-section
+  margin-bottom: 18px
+  border-bottom: 2px solid $grey-color
+
+  &_sub-title
+    display: block
+    margin-bottom: 4px
+    color: $grey-color
+
+  &__exp-group
+    margin-top: 7px
+    margin-bottom: 28px
+
+  &__position
+    margin-bottom: 24px
+    font-weight: 700
+
+#collapsePortfolio
+  margin-top: 16px
+
+footer
+  margin-bottom: 18px
+
+  .top
+    text-align: right
+
+@media (max-width: 991px)
+  .container
+    box-shadow: none
+    margin-bottom: 0
+
+  h1
+    display: block
+    text-align: center
+
+  .header
+    &__subtitle
+      margin-bottom: 18px
+      text-align: center
+
+  footer
+    text-align: center
+
+    .top
+      display: block
+      margin-top: 20px
+      margin-bottom: 12px
+      font-size: 18px
+      font-weight: 700
+      text-align: center
