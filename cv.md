@@ -32,151 +32,142 @@ Telegram: [@nadeocfg](https://t.me/nadeocfg)
 More than 50 projects, since 2013 year.
 Latest:
 
+- [https://asterx.kz/](https://asterx.kz/)
+- [https://aster.kz/](https://aster.kz/)
 - [https://z-star.kz/](https://z-star.kz/)
 - [http://steam.z-star.kz/](http://steam.z-star.kz/)
-- [https://tepliy-dom.webils.kz/](https://tepliy-dom.webils.kz/)
 - [http://sauvage.kz/](http://sauvage.kz/)
 
 <details>
  <summary>Code examples</summary>
  <pre>
-  // Sidebar fields
-  let startBtn = document.getElementById("start"),
-    val = document.querySelectorAll("div[class*='value']"),
-    reqExpenses = document.querySelectorAll(".expenses-item"),
-    timeData = document.querySelectorAll("input[class*='value']");
+  import React, { Component } from 'react'
+  import instance from '../../lib/axios';
+  import { KEY_API_URL } from '../../lib/env';
+  import { getChip } from '../../lib/utils';
+  import { LinearProgress, IconButton, Chip } from '@material-ui/core';
+  import EditIcon from '@material-ui/icons/Edit';
+  import ChangeParkNumberDialog from '../ChangeParkNumberDialog';
+  import moment from 'moment';
 
-  // Buttons
-  let reqBtn = document.querySelector(".expenses-item-btn"),
-    optBtn = document.querySelector(".optionalexpenses-btn"),
-    budgetBtn = document.querySelector(".count-budget-btn");
+export default class AllKeys extends Component {
 
-  // data fields
-  let optFields = document.querySelectorAll(".optionalexpenses-item"),
-    reqFields = document.querySelectorAll(".expenses-item"),
-    inc = document.querySelector("#income"),
-    savings = document.querySelector("#savings"),
-    savingsSum = document.querySelector("#sum"),
-    savingsPercent = document.querySelector("#percent");
+    constructor(props) {
+      super(props);
 
-  let money, time;
+      this.state = {
+        assignKeyDialogOpen: false,
+        isChangeParkNumberDialogOpen: false,
+        currentKey: null,
 
-  startBtn.addEventListener("click", function () {
-    time = prompt("Введите дату в формате YYYY-MM-DD", "1990-07-16");
-    money = +prompt("Ваш бюджет на месяц?", "100000");
-
-    while (isNaN(money) || money == "" || money == null) {
-      money = +prompt("Ваш бюджет на месяц?", "100000");
-    }
-
-    appData.budget = money;
-    appData.timeData = time;
-
-    val[0].textContent = money.toFixed();
-    timeData[0].value = new Date(Date.parse(time)).getFullYear();
-    timeData[1].value = new Date(Date.parse(time)).getMonth() + 1;
-    timeData[2].value = new Date(Date.parse(time)).getDate();
-  });
-
-  reqBtn.addEventListener("click", function () {
-    let sum = 0;
-
-    for (let i = 0; i < reqExpenses.length; i++) {
-      let a = reqExpenses[i].value,
-        b = reqExpenses[++i].value;
-
-      if (
-        typeof a === "string" &&
-        typeof a != null &&
-        typeof b === "string" &&
-        typeof b != null &&
-        a != "" &&
-        b != "" &&
-        a.length < 50
-      ) {
-        appData.expenses[a] = b;
-        sum += +b;
-      } else {
-        i = i - 1;
+        //pagintaion
+        limit: 10,
+        offset: 0,
+        allKeys: [],
       }
     }
-    val[3].textContent = sum;
-  });
 
-  optBtn.addEventListener("click", function () {
-    for (let i = 0; i < optFields.length; i++) {
-      let opt = optFields[i].value;
-      appData.optionalExpenses[i] = opt;
-      val[4].textContent += appData.optionalExpenses[i] + ' ';
-    }
-  });
+    getAllKeys = async (limit = 10, offset = 0) => {
 
-  budgetBtn.addEventListener("click", function () {
-    if (appData.budget != undefined) {
-      appData.moneyPerDay = (appData.budget / 30).toFixed();
-      val[1].textContent = appData.moneyPerDay;
-
-      if (appData.moneyPerDay < 100) {
-        val[2].textContent = "Минимальный уровень достатка";
-      } else if (appData.moneyPerDay > 100 && appData.moneyPerDay < 2000) {
-        val[2].textContent = "Средний уровень достатка";
-      } else if (appData.moneyPerDay > 2000) {
-        val[2].textContent = "Высокий уровень достатка";
-      } else {
-        val[2].textContent = "Произошла ошибка";
+      const data = {
+        limit: limit,
+        offset: offset,
       }
-    } else {
-      val[1].textContent = "Не нажали кнопку Начать расчет!";
+
+      this.setState({
+        isLoading: true
+      });
+      let allKeys;
+      try {
+        allKeys = await instance.post(`${KEY_API_URL}/keys/getKeys`, data).then(response => response.data.list || []);
+        console.log(allKeys);
+      } catch (error) {
+        console.log({ error });
+      }
+
+      this.setState({
+        allKeys,
+        isLoading: false
+      }, () => console.log(this.state));
     }
-  });
 
-  inc.addEventListener("input", function () {
-    let items = inc.value;
-    appData.income = items.split(", ");
-    val[5].textContent = appData.income;
-  });
-
-  savings.addEventListener("click", function () {
-    if (appData.savings == true) {
-      appData.savings = false;
-    } else {
-      appData.savings = true;
+    handleChangeParkNumber = currentKey => {
+      this.setState({
+        currentKey
+      }, () => {
+        this.setState({
+          isChangeParkNumberDialogOpen: true
+        }, console.log(this.state))
+      })
     }
-  });
 
-  savingsSum.addEventListener("input", function () {
-    if (appData.savings == true) {
-      let sum = +savingsSum.value,
-        percent = +savingsPercent.value;
-
-      appData.monthIncome = (sum / 100 / 12) * percent;
-      appData.yearIncome = (sum / 100) * percent;
-
-      val[6].textContent = appData.monthIncome.toFixed(1);
-      val[7].textContent = appData.yearIncome.toFixed(1);
+    handleChangeParkNumberDialogClose = () => {
+      this.setState({
+        isChangeParkNumberDialogOpen: false,
+      })
+      this.getAllKeys();
     }
-  });
 
-  savingsPercent.addEventListener("input", function () {
-    if (appData.savings == true) {
-      let sum = +savingsSum.value,
-        percent = +savingsPercent.value;
-      appData.monthIncome = (sum / 100 / 12) * percent;
-      appData.yearIncome = (sum / 100) * percent;
-
-      val[6].textContent = appData.monthIncome.toFixed(1);
-      val[7].textContent = appData.yearIncome.toFixed(1);
+    componentDidMount() {
+      this.getAllKeys();
     }
-  });
 
-  let appData = {
-    budget: money,
-    expenses: {},
-    optionalExpenses: {},
-    income: [],
-    timeData: time,
-    savings: false
-  };
+    render() {
+
+      const { allKeys, isLoading, isChangeParkNumberDialogOpen, currentKey } = this.state;
+
+      if (isLoading) {
+        return <LinearProgress />
+      }
+
+      return (
+        <div className="keys">
+          {allKeys.map((key, index) => (
+            <div className="keys__item key" key={index}>
+              <div className="key__title">
+                <div className="key__title_main">
+                  <h2>№ {key.keyNumber}</h2>
+                  {getChip(key)}
+                  {key.attachDate && (
+                    <Chip
+                      label={moment(key.attachDate).format('DD.MM.YYYY')}
+                      color="primary"
+                    />
+                  )}
+                </div>
+
+                <h3>{key.car.marka.name} {key.car.model.name} {key.car.year}</h3>
+                <p>{key.car.vin}</p>
+              </div>
+
+              <div className="key__stock">
+                {key.stockPlace ? (
+                  <>
+                    <p>Сток: {key.stockPlace.stock.name}</p>
+                    <p>Ряд: {key.stockPlace.rowNo}</p>
+                    <p>Место: {key.stockPlace.placeNo}</p>
+                  </>
+                ) : (
+                    <p>У машины нет парковочного места</p>
+                  )}
+              </div>
+
+              <div className="key__actions">
+                <IconButton color="primary" component="span" onClick={() => this.handleChangeParkNumber(key)}>
+                  <EditIcon />
+                </IconButton>
+              </div>
+
+            </div>
+          ))}
+
+          <ChangeParkNumberDialog open={isChangeParkNumberDialogOpen} handleClose={this.handleChangeParkNumberDialogClose} currentKey={currentKey} />
+        </div>
+      )
+    }
+
+}
+
  </pre>
 </details>
 
