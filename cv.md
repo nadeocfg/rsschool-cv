@@ -41,132 +41,136 @@ Latest:
 <details>
  <summary>Code examples</summary>
  <pre>
-  import React, { Component } from 'react'
-  import instance from '../../lib/axios';
-  import { KEY_API_URL } from '../../lib/env';
-  import { getChip } from '../../lib/utils';
-  import { LinearProgress, IconButton, Chip } from '@material-ui/core';
-  import EditIcon from '@material-ui/icons/Edit';
-  import ChangeParkNumberDialog from '../ChangeParkNumberDialog';
-  import moment from 'moment';
+
+```javascript
+import React, { Component } from "react";
+import instance from "../../lib/axios";
+import { KEY_API_URL } from "../../lib/env";
+import { getChip } from "../../lib/utils";
+import { LinearProgress, IconButton, Chip } from "@material-ui/core";
+import EditIcon from "@material-ui/icons/Edit";
+import ChangeParkNumberDialog from "../ChangeParkNumberDialog";
+import moment from "moment";
 
 export default class AllKeys extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-      super(props);
+    this.state = {
+      assignKeyDialogOpen: false,
+      isChangeParkNumberDialogOpen: false,
+      currentKey: null,
 
-      this.state = {
-        assignKeyDialogOpen: false,
-        isChangeParkNumberDialogOpen: false,
-        currentKey: null,
+      //pagintaion
+      limit: 10,
+      offset: 0,
+      allKeys: [],
+    };
+  }
 
-        //pagintaion
-        limit: 10,
-        offset: 0,
-        allKeys: [],
-      }
+  getAllKeys = async (limit = 10, offset = 0) => {
+    const data = {
+      limit: limit,
+      offset: offset,
+    };
+
+    this.setState({
+      isLoading: true,
+    });
+    let allKeys;
+    try {
+      allKeys = await instance.post(`${KEY_API_URL}/keys/getKeys`, data).then((response) => response.data.list || []);
+      console.log(allKeys);
+    } catch (error) {
+      console.log({ error });
     }
 
-    getAllKeys = async (limit = 10, offset = 0) => {
-
-      const data = {
-        limit: limit,
-        offset: offset,
-      }
-
-      this.setState({
-        isLoading: true
-      });
-      let allKeys;
-      try {
-        allKeys = await instance.post(`${KEY_API_URL}/keys/getKeys`, data).then(response => response.data.list || []);
-        console.log(allKeys);
-      } catch (error) {
-        console.log({ error });
-      }
-
-      this.setState({
+    this.setState(
+      {
         allKeys,
-        isLoading: false
-      }, () => console.log(this.state));
-    }
+        isLoading: false,
+      },
+      () => console.log(this.state)
+    );
+  };
 
-    handleChangeParkNumber = currentKey => {
-      this.setState({
-        currentKey
-      }, () => {
-        this.setState({
-          isChangeParkNumberDialogOpen: true
-        }, console.log(this.state))
-      })
-    }
-
-    handleChangeParkNumberDialogClose = () => {
-      this.setState({
-        isChangeParkNumberDialogOpen: false,
-      })
-      this.getAllKeys();
-    }
-
-    componentDidMount() {
-      this.getAllKeys();
-    }
-
-    render() {
-
-      const { allKeys, isLoading, isChangeParkNumberDialogOpen, currentKey } = this.state;
-
-      if (isLoading) {
-        return <LinearProgress />
+  handleChangeParkNumber = (currentKey) => {
+    this.setState(
+      {
+        currentKey,
+      },
+      () => {
+        this.setState(
+          {
+            isChangeParkNumberDialogOpen: true,
+          },
+          console.log(this.state)
+        );
       }
+    );
+  };
 
-      return (
-        <div className="keys">
-          {allKeys.map((key, index) => (
-            <div className="keys__item key" key={index}>
-              <div className="key__title">
-                <div className="key__title_main">
-                  <h2>№ {key.keyNumber}</h2>
-                  {getChip(key)}
-                  {key.attachDate && (
-                    <Chip
-                      label={moment(key.attachDate).format('DD.MM.YYYY')}
-                      color="primary"
-                    />
-                  )}
-                </div>
+  handleChangeParkNumberDialogClose = () => {
+    this.setState({
+      isChangeParkNumberDialogOpen: false,
+    });
+    this.getAllKeys();
+  };
 
-                <h3>{key.car.marka.name} {key.car.model.name} {key.car.year}</h3>
-                <p>{key.car.vin}</p>
-              </div>
+  componentDidMount() {
+    this.getAllKeys();
+  }
 
-              <div className="key__stock">
-                {key.stockPlace ? (
-                  <>
-                    <p>Сток: {key.stockPlace.stock.name}</p>
-                    <p>Ряд: {key.stockPlace.rowNo}</p>
-                    <p>Место: {key.stockPlace.placeNo}</p>
-                  </>
-                ) : (
-                    <p>У машины нет парковочного места</p>
-                  )}
-              </div>
+  render() {
+    const { allKeys, isLoading, isChangeParkNumberDialogOpen, currentKey } = this.state;
 
-              <div className="key__actions">
-                <IconButton color="primary" component="span" onClick={() => this.handleChangeParkNumber(key)}>
-                  <EditIcon />
-                </IconButton>
-              </div>
-
-            </div>
-          ))}
-
-          <ChangeParkNumberDialog open={isChangeParkNumberDialogOpen} handleClose={this.handleChangeParkNumberDialogClose} currentKey={currentKey} />
-        </div>
-      )
+    if (isLoading) {
+      return <LinearProgress />;
     }
 
+    return (
+      <div className="keys">
+        {allKeys.map((key, index) => (
+          <div className="keys__item key" key={index}>
+            <div className="key__title">
+              <div className="key__title_main">
+                <h2>№ {key.keyNumber}</h2>
+                {getChip(key)}
+                {key.attachDate && <Chip label={moment(key.attachDate).format("DD.MM.YYYY")} color="primary" />}
+              </div>
+
+              <h3>
+                {key.car.marka.name} {key.car.model.name} {key.car.year}
+              </h3>
+              <p>{key.car.vin}</p>
+            </div>
+
+            <div className="key__stock">
+              {key.stockPlace ? (
+                <>
+                  <p>Сток: {key.stockPlace.stock.name}</p>
+                  <p>Ряд: {key.stockPlace.rowNo}</p>
+                  <p>Место: {key.stockPlace.placeNo}</p>
+                </>
+              ) : (
+                <p>У машины нет парковочного места</p>
+              )}
+            </div>
+
+            <div className="key__actions">
+              <IconButton color="primary" component="span" onClick={() => this.handleChangeParkNumber(key)}>
+                <EditIcon />
+              </IconButton>
+            </div>
+          </div>
+        ))}
+
+        <ChangeParkNumberDialog open={isChangeParkNumberDialogOpen} handleClose={this.handleChangeParkNumberDialogClose} currentKey={currentKey} />
+      </div>
+    );
+  }
 }
+```
 
  </pre>
 </details>
